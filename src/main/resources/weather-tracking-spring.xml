@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>config.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="connectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${amq.Url}"/>
+        <property name="trustAllPackages" value="true"/>
+    </bean>
+    <bean id="jmsConfig" class="org.apache.camel.component.jms.JmsConfiguration">
+        <property name="connectionFactory" ref="connectionFactory"/>
+    </bean>
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="configuration" ref="jmsConfig"/>
+    </bean>
+
+    <bean id="weather.Master" class="com.weather.master.WeatherMasterStart">
+        <property name="queueName" value="${queueName}" />
+        <property name="factory" ref="connectionFactory" />
+    </bean>
+
+    <bean id="weather.Sensor" class="com.weather.sensor.WeatherSensorStart">
+        <property name="queueName" value="${queueName}" />
+        <property name="factory" ref="connectionFactory" />
+    </bean>
+
+</beans>
